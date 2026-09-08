@@ -28,7 +28,7 @@ class LongSet(
     fun isEmpty(): Boolean = size == 0
     fun isNotEmpty(): Boolean = size != 0
 
-    fun contains(key: Long): Boolean = key != nulled && indexOf(key) >= 0
+    operator fun contains(key: Long): Boolean = key != nulled && indexOf(key) >= 0
 
     fun add(key: Long): Boolean {
         require(key != nulled) { "Key $key is reserved as empty-slot sentinel (nulled)" }
