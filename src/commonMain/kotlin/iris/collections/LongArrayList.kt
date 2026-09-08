@@ -296,7 +296,7 @@ class LongArrayList private constructor(
         val es = elementData
         for (i in from until to) {
             val o = other[i - from]
-            if (!(es[i] == o)) return false
+            if (es[i] != o) return false
         }
         return true
     }
@@ -470,7 +470,7 @@ class LongArrayList private constructor(
         val es = elementData
         for (i in 0 until size) {
             val o = other[i]
-            if (!(es[i] == o)) return false
+            if (es[i] != o) return false
         }
         return true
     }
