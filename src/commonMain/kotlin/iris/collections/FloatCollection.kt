@@ -30,6 +30,66 @@ interface FloatCollection : PrimitiveCollection {
         truncated: CharSequence = "...",
         transform: ((Float) -> CharSequence)? = null,
     ): String
+    fun sum(): Float {
+        var s = 0f
+        val it = iterator()
+        while (it.hasNext()) s += it.next()
+        return s
+    }
+
+    fun average(): Double {
+        if (isEmpty()) return Double.NaN
+        return sum().toDouble() / size
+    }
+
+    fun first(): Float {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty FloatCollection")
+        return it.next()
+    }
+
+    fun last(): Float {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty FloatCollection")
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun firstOrElse(default: Float): Float {
+        val it = iterator()
+        return if (it.hasNext()) it.next() else default
+    }
+
+    fun lastOrElse(default: Float): Float {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun minOrElse(default: Float): Float {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v < m) m = v
+        }
+        return m
+    }
+
+    fun maxOrElse(default: Float): Float {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v > m) m = v
+        }
+        return m
+    }
 }
 
 interface FloatList : FloatCollection {
