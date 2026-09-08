@@ -92,11 +92,13 @@ val boxed: MutableList<Int> = ids.asMutableList()
 | Список иногда вырастает до тысяч | да |
 | Короткий `Byte` / флаг | слабо: бокс и так кэширован; для флагов лучше битсет |
 
-## Сравнение с ArrayList (JMH, avgt)
+## Сравнение с JDK (JMH, avgt + `-prof gc`)
 
-Во сколько раз `*ArrayList` быстрее боксящего `ArrayList<T>`. JVM, Kotlin 2.1.20.
+JVM, Kotlin 2.1.20, G1, `-Xmx256m`.  
+**×** в таблицах времени — во сколько раз примитив быстрее бокса. Жирным — заметный отрыв.  
+**B/op** — `gc.alloc.rate.norm`, байт на одну операцию (создание коллекции + наполнение / один get). `≈0` — шум профилировщика.
 
-**IntArrayList vs ArrayList&lt;Int&gt;**
+### IntArrayList vs ArrayList&lt;Int&gt; — время
 
 | Операция | 16 | 1 024 | 100 000 |
 | --- | ---: | ---: | ---: |
@@ -107,7 +109,7 @@ val boxed: MutableList<Int> = ids.asMutableList()
 | iterator | ×1.7 | ×2.3 | ×2.6 |
 | contains | ×1.9 | ×3.4 | **×3.8** |
 
-**LongArrayList vs ArrayList&lt;Long&gt;**
+### LongArrayList vs ArrayList&lt;Long&gt; — время
 
 | Операция | 16 | 1 024 | 100 000 |
 | --- | ---: | ---: | ---: |
@@ -118,11 +120,100 @@ val boxed: MutableList<Int> = ids.asMutableList()
 | iterator | ×1.7 | ×2.3 | **×2.8** |
 | contains | ×1.6 | ×3.1 | **×2.7** |
 
-На 16 элементах абсолютные числа для Int: add 113 нс vs 70 нс, presized add 64 нс vs 16 нс, обход 16–20 нс vs 9–12 нс.
+На 16 элементах абсолюты Int: add 113 нс vs 70 нс, presized add 64 нс vs 16 нс, обход 16–20 нс vs 9–12 нс.  
+На 100k обход примитива ~30 µs и у Int, и у Long.
 
-На 100k обход примитива ~30 µs и у Int, и у Long; `get` / `forEach` / `iterator` / `sum` совпадают — `inline forEach` не хуже сырого цикла.
+### IntMap vs HashMap&lt;Int, V&gt; — время
 
-`Byte`/`Boolean` так не разгонятся: `Byte.valueOf` кэширует все 256 значений, `Boolean.TRUE`/`FALSE` — синглтоны. Там выигрыш в плотности массива, не в аллокациях.
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| put | ×0.7 | ×0.7 | ×1.0 |
+| put presized | **×2.6** | **×2.3** | **×2.3** |
+| get / contains | ~1 | ~1 | ~1 |
+| forEach | ×1.4 | ×2.2 | ×0.5 |
+
+### LongMap vs HashMap&lt;Long, V&gt; — время
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| put | ×0.6 | ×0.6 | ×0.8 |
+| put presized | **×2.3** | **×1.9** | **×2.7** |
+| get / contains | ~1 | ~1 | ~1 |
+| forEach | ×1.4 | ×2.2 | ×0.6 |
+
+### IntSet vs HashSet&lt;Int&gt; — время
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| add | ×1.0 | ×0.9 | ×2.0 |
+| add presized | **×4.8** | **×3.2** | **×7.6** |
+| contains | ~1 | ~1 | ~1 |
+| forEach | **×3.3** | **×7.7** | **×6.1** |
+
+`get`/`contains` у map/set — 5–8 нс, шум.  
+`forEach` map на 100k медленнее: open addressing сканирует пустые слоты. У set слотов меньше — обход выигрывает.
+
+---
+
+### Списки — аллокации, B/op
+
+Число = boxed / primitive.
+
+**IntArrayList**
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| add | 240 / 240 | 29 341 / 15 002 | 2.88M / 1.28M |
+| add presized | 104 / **80** | 18 475 / **4 113** | 2.00M / **0.40M** |
+| get / forEach / iterator | ≈0 / ≈0 | ≈0 / ≈0 | ≈0 / ≈0 |
+| contains | ≈0 / ≈0 | 16 / ≈0 | 16 / ≈0 |
+
+**LongArrayList**
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| add | 240 / 424 | 36 510 / 29 733 | 3.68M / 2.56M |
+| add presized | 104 / 144 | 25 644 / **8 209** | 2.80M / **0.80M** |
+| get / forEach / iterator | ≈0 / ≈0 | ≈0 / ≈0 | ≈0 / ≈0 |
+| contains | ≈0 / ≈0 | 24 / ≈0 | 24 / ≈0 |
+
+Без presize на 16 Int платит столько же: рост backing-массива. С presize на 100k — **×5** меньше кучи у Int, **×3.5** у Long.  
+`contains` у `ArrayList` боксит искомое значение (16 B Int / 24 B Long). Примитив — нет.
+
+### Map — аллокации, B/op
+
+**IntMap**
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| put | 784 / 688 | 63 610 / 37 270 | 6.90M / 4.73M |
+| put presized | 784 / **336** | 59 482 / **18 483** | 6.38M / **2.36M** |
+| get / contains | ≈0 / ≈0 | **16** / ≈0 | **16** / ≈0 |
+| forEach | ≈0 / ≈0 | ≈0 / ≈0 | ≈0 / ≈0 |
+
+**LongMap**
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| put | 784 / 920 | 70 779 / 53 633 | 7.70M / 6.82M |
+| put presized | 784 / **464** | 66 651 / **26 676** | 7.18M / **3.41M** |
+| get / contains | ≈0 / ≈0 | **24** / ≈0 | **24** / ≈0 |
+| forEach | ≈0 / ≈0 | ≈0 / ≈0 | ≈0 / ≈0 |
+
+HashMap на каждый `get`/`contains` боксит ключ. Presized IntMap на 100k: **×2.7** меньше байт. `gc.time` put HashMap 100k ≈ 1.4–1.6 с за прогон, presized IntMap ≈ 0.45 с.
+
+### IntSet — аллокации, B/op
+
+| Операция | 16 | 1 024 | 100 000 |
+| --- | ---: | ---: | ---: |
+| add | 784 / 416 | 63 610 / 20 771 | 6.91M / 2.62M |
+| add presized | 784 / **192** | 59 498 / **10 274** | 6.38M / **1.31M** |
+| contains | ≈0 / ≈0 | **16** / ≈0 | **16** / ≈0 |
+| forEach | ≈0 / ≈0 | ≈0 / ≈0 | ≈0 / ≈0 |
+
+Presized Set на 16: **×4** меньше кучи (192 vs 784). На 100k: **×4.9**.
+
+`Byte`/`Boolean` по CPU так не разгонятся: `Byte.valueOf` кэширует все 256 значений. Выигрыш там в плотности массива, не в аллокациях lookup.
 
 ## Контракт
 
@@ -134,26 +225,18 @@ val boxed: MutableList<Int> = ids.asMutableList()
 - итератор fail-fast через `modCount`
 - `asMutableList()` — полный адаптер, не `TODO`
 
-## Бенчмарки
+## Как гонять бенчи
 
 ```bash
-./gradlew jvmBenchmarkBenchmark
-./gradlew jvmBenchmarkShort30Benchmark   # только Long, если включён конфиг short30
-./gradlew jvmBenchmarkGcBenchmark        # + JMH -prof gc, куча 256m
+./gradlew jvmBenchmarkBenchmark          # время, kotlinx summary
+./gradlew jmhProfGc                      # сырой JMH + -prof gc, куча 256m
 ```
 
-`gc` добавляет колонки JMH GC-профилировщика (Score по-прежнему ns/op):
+`jvmBenchmarkGcBenchmark` **не** печатает `gc.alloc.rate.norm`: kotlinx-runner игнорирует `-prof` и в summary оставляет Score.
 
-- `gc.alloc.rate` — МБ/с
-- `gc.alloc.rate.norm` — байт на операцию, главное число
-- `gc.count` / `gc.time` — сколько раз и сколько суммарно собирали за итерацию
+`jmhProfGc` — `org.openjdk.jmh.Main -prof gc`:
 
-`get`/`contains` почти без аллокаций у обоих. Смотреть `put`/`add` и presized vs рост с нуля.
+- `gc.alloc.rate.norm` — байт на операцию
+- `gc.count` / `gc.time` — сколько раз и сколько собирали за измерение
 
-Сценарии:
-
-- списки: `*ArrayListBenchmark.kt` — add / add presized, get, forEach, sum, contains, iterator
-- map: `IntMapBenchmark.kt`, `LongMapBenchmark.kt` vs `HashMap` — put / put presized, get, contains, forEach
-- set: `IntSetBenchmark.kt` vs `HashSet` — add / add presized, contains, forEach
-
-Размеры: 16 / 1024 / 100000.
+Сценарии: `*ArrayListBenchmark`, `IntMapBenchmark`, `LongMapBenchmark`, `IntSetBenchmark`. Размеры: 16 / 1024 / 100000.
