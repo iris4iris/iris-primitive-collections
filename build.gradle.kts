@@ -49,7 +49,6 @@ benchmark {
             iterationTimeUnit = "s"
             include(".*LongArrayListBenchmark.*")
         }
-        // JMH -prof gc: alloc rate / bytes per op. Score still ns/op.
         register("gc") {
             warmups = 2
             iterations = 3
@@ -59,11 +58,23 @@ benchmark {
     }
 }
 
-tasks.withType<JavaExec>().configureEach {
-    if (name == "jvmBenchmarkGcBenchmark") {
-        jvmArgs("-Xmx256m")
-        doFirst {
-            args(args + listOf("-prof", "gc"))
-        }
-    }
+// kotlinx JvmBenchmarkRunner ignores extra JMH flags like -prof.
+tasks.register<JavaExec>("jmhProfGc") {
+    group = "benchmark"
+    description = "Raw JMH with -prof gc (alloc rate / B/op)"
+    dependsOn("jvmBenchmarkBenchmarkJar")
+    mainClass.set("org.openjdk.jmh.Main")
+    classpath(tasks.named("jvmBenchmarkBenchmarkJar"))
+    jvmArgs("-Xmx256m")
+    args(
+        ".*",
+        "-prof", "gc",
+        "-f", "1",
+        "-wi", "2",
+        "-i", "3",
+        "-w", "1",
+        "-r", "1",
+        "-bm", "avgt",
+        "-tu", "ns",
+    )
 }
