@@ -513,6 +513,56 @@ class IntArrayList private constructor(
         return sb.toString()
     }
 
+    override fun sum(): Int {
+        val data = elementData
+        val s = size
+        var acc = 0
+        for (i in 0 until s) acc += data[i]
+        return acc
+    }
+
+    override fun average(): Double {
+        if (size == 0) return Double.NaN
+        return sum().toDouble() / size
+    }
+
+    override fun first(): Int {
+        if (size == 0) throw NoSuchElementException("Empty IntArrayList")
+        return elementData[0]
+    }
+
+    override fun last(): Int {
+        val s = size
+        if (s == 0) throw NoSuchElementException("Empty IntArrayList")
+        return elementData[s - 1]
+    }
+
+    override fun firstOrElse(default: Int): Int =
+        if (size == 0) default else elementData[0]
+
+    override fun lastOrElse(default: Int): Int {
+        val s = size
+        return if (s == 0) default else elementData[s - 1]
+    }
+
+    override fun minOrElse(default: Int): Int {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] < m) m = data[i]
+        return m
+    }
+
+    override fun maxOrElse(default: Int): Int {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] > m) m = data[i]
+        return m
+    }
+
     companion object {
         private val EMPTY: IntArray = intArrayOf()
 
@@ -527,46 +577,6 @@ class IntArrayList private constructor(
     }
 }
 
-
-fun IntList.sum(): Int {
-    var s: Int = 0
-    forEach { s += it }
-    return s
-}
-
-
-fun IntList.average(): Double {
-    if (isEmpty()) return Double.NaN
-    return sum().toDouble() / size
-}
-
-
-fun IntList.minOrNull(): Int? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] < m) m = this[i]
-    return m
-}
-
-fun IntList.maxOrNull(): Int? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] > m) m = this[i]
-    return m
-}
-
-fun IntList.first(): Int {
-    if (isEmpty()) throw NoSuchElementException("Empty IntList")
-    return this[0]
-}
-
-fun IntList.last(): Int {
-    if (isEmpty()) throw NoSuchElementException("Empty IntList")
-    return this[lastIndex]
-}
-
-fun IntList.firstOrNull(): Int? = if (isEmpty()) null else this[0]
-fun IntList.lastOrNull(): Int? = if (isEmpty()) null else this[lastIndex]
 
 inline fun IntCollection.forEach(action: (Int) -> Unit) {
     val it = iterator()

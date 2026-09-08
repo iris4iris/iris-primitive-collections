@@ -30,6 +30,66 @@ interface DoubleCollection : PrimitiveCollection {
         truncated: CharSequence = "...",
         transform: ((Double) -> CharSequence)? = null,
     ): String
+    fun sum(): Double {
+        var s = 0.0
+        val it = iterator()
+        while (it.hasNext()) s += it.next()
+        return s
+    }
+
+    fun average(): Double {
+        if (isEmpty()) return Double.NaN
+        return sum() / size
+    }
+
+    fun first(): Double {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty DoubleCollection")
+        return it.next()
+    }
+
+    fun last(): Double {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty DoubleCollection")
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun firstOrElse(default: Double): Double {
+        val it = iterator()
+        return if (it.hasNext()) it.next() else default
+    }
+
+    fun lastOrElse(default: Double): Double {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun minOrElse(default: Double): Double {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v < m) m = v
+        }
+        return m
+    }
+
+    fun maxOrElse(default: Double): Double {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v > m) m = v
+        }
+        return m
+    }
 }
 
 interface DoubleList : DoubleCollection {
@@ -62,6 +122,7 @@ interface PrimitiveDoubleIterator {
     fun next(): Double
     fun remove()
 }
+
 
 inline fun <T> Iterable<T>.mapDoubles(transform: (T) -> Double): DoubleArrayList {
     val out = DoubleArrayList(guessSize())

@@ -513,6 +513,57 @@ class DoubleArrayList private constructor(
         return sb.toString()
     }
 
+
+    override fun sum(): Double {
+        val data = elementData
+        val s = size
+        var acc = 0.0
+        for (i in 0 until s) acc += data[i]
+        return acc
+    }
+
+    override fun average(): Double {
+        if (size == 0) return Double.NaN
+        return sum() / size
+    }
+
+    override fun first(): Double {
+        if (size == 0) throw NoSuchElementException("Empty DoubleArrayList")
+        return elementData[0]
+    }
+
+    override fun last(): Double {
+        val s = size
+        if (s == 0) throw NoSuchElementException("Empty DoubleArrayList")
+        return elementData[s - 1]
+    }
+
+    override fun firstOrElse(default: Double): Double =
+        if (size == 0) default else elementData[0]
+
+    override fun lastOrElse(default: Double): Double {
+        val s = size
+        return if (s == 0) default else elementData[s - 1]
+    }
+
+    override fun minOrElse(default: Double): Double {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] < m) m = data[i]
+        return m
+    }
+
+    override fun maxOrElse(default: Double): Double {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] > m) m = data[i]
+        return m
+    }
+
     companion object {
         private val EMPTY: DoubleArray = doubleArrayOf()
 
@@ -527,46 +578,6 @@ class DoubleArrayList private constructor(
     }
 }
 
-
-fun DoubleList.sum(): Double {
-    var s: Double = 0.0
-    forEach { s += it }
-    return s
-}
-
-
-fun DoubleList.average(): Double {
-    if (isEmpty()) return Double.NaN
-    return sum().toDouble() / size
-}
-
-
-fun DoubleList.minOrNull(): Double? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] < m) m = this[i]
-    return m
-}
-
-fun DoubleList.maxOrNull(): Double? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] > m) m = this[i]
-    return m
-}
-
-fun DoubleList.first(): Double {
-    if (isEmpty()) throw NoSuchElementException("Empty DoubleList")
-    return this[0]
-}
-
-fun DoubleList.last(): Double {
-    if (isEmpty()) throw NoSuchElementException("Empty DoubleList")
-    return this[lastIndex]
-}
-
-fun DoubleList.firstOrNull(): Double? = if (isEmpty()) null else this[0]
-fun DoubleList.lastOrNull(): Double? = if (isEmpty()) null else this[lastIndex]
 
 inline fun DoubleCollection.forEach(action: (Double) -> Unit) {
     val it = iterator()

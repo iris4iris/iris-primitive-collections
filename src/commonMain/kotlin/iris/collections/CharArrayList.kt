@@ -513,6 +513,57 @@ class CharArrayList private constructor(
         return sb.toString()
     }
 
+
+    override fun sum(): Int {
+        val data = elementData
+        val s = size
+        var acc = 0
+        for (i in 0 until s) acc += data[i].code
+        return acc
+    }
+
+    override fun average(): Double {
+        if (size == 0) return Double.NaN
+        return sum().toDouble() / size
+    }
+
+    override fun first(): Char {
+        if (size == 0) throw NoSuchElementException("Empty CharArrayList")
+        return elementData[0]
+    }
+
+    override fun last(): Char {
+        val s = size
+        if (s == 0) throw NoSuchElementException("Empty CharArrayList")
+        return elementData[s - 1]
+    }
+
+    override fun firstOrElse(default: Char): Char =
+        if (size == 0) default else elementData[0]
+
+    override fun lastOrElse(default: Char): Char {
+        val s = size
+        return if (s == 0) default else elementData[s - 1]
+    }
+
+    override fun minOrElse(default: Char): Char {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] < m) m = data[i]
+        return m
+    }
+
+    override fun maxOrElse(default: Char): Char {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] > m) m = data[i]
+        return m
+    }
+
     companion object {
         private val EMPTY: CharArray = charArrayOf()
 
@@ -527,33 +578,6 @@ class CharArrayList private constructor(
     }
 }
 
-
-fun CharList.minOrNull(): Char? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] < m) m = this[i]
-    return m
-}
-
-fun CharList.maxOrNull(): Char? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] > m) m = this[i]
-    return m
-}
-
-fun CharList.first(): Char {
-    if (isEmpty()) throw NoSuchElementException("Empty CharList")
-    return this[0]
-}
-
-fun CharList.last(): Char {
-    if (isEmpty()) throw NoSuchElementException("Empty CharList")
-    return this[lastIndex]
-}
-
-fun CharList.firstOrNull(): Char? = if (isEmpty()) null else this[0]
-fun CharList.lastOrNull(): Char? = if (isEmpty()) null else this[lastIndex]
 
 inline fun CharCollection.forEach(action: (Char) -> Unit) {
     val it = iterator()

@@ -30,6 +30,67 @@ interface LongCollection : PrimitiveCollection {
         truncated: CharSequence = "...",
         transform: ((Long) -> CharSequence)? = null,
     ): String
+
+    fun sum(): Long {
+        var s = 0L
+        val it = iterator()
+        while (it.hasNext()) s += it.next()
+        return s
+    }
+
+    fun average(): Double {
+        if (isEmpty()) return Double.NaN
+        return sum().toDouble() / size
+    }
+
+    fun first(): Long {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty LongCollection")
+        return it.next()
+    }
+
+    fun last(): Long {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty LongCollection")
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun firstOrElse(default: Long): Long {
+        val it = iterator()
+        return if (it.hasNext()) it.next() else default
+    }
+
+    fun lastOrElse(default: Long): Long {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun minOrElse(default: Long): Long {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v < m) m = v
+        }
+        return m
+    }
+
+    fun maxOrElse(default: Long): Long {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v > m) m = v
+        }
+        return m
+    }
 }
 
 interface LongList : LongCollection {
@@ -62,6 +123,7 @@ interface PrimitiveLongIterator {
     fun next(): Long
     fun remove()
 }
+
 
 inline fun <T> Iterable<T>.mapLongs(transform: (T) -> Long): LongArrayList {
     val out = LongArrayList(guessSize())

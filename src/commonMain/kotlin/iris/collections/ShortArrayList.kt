@@ -513,6 +513,57 @@ class ShortArrayList private constructor(
         return sb.toString()
     }
 
+
+    override fun sum(): Int {
+        val data = elementData
+        val s = size
+        var acc = 0
+        for (i in 0 until s) acc += data[i].toInt()
+        return acc
+    }
+
+    override fun average(): Double {
+        if (size == 0) return Double.NaN
+        return sum().toDouble() / size
+    }
+
+    override fun first(): Short {
+        if (size == 0) throw NoSuchElementException("Empty ShortArrayList")
+        return elementData[0]
+    }
+
+    override fun last(): Short {
+        val s = size
+        if (s == 0) throw NoSuchElementException("Empty ShortArrayList")
+        return elementData[s - 1]
+    }
+
+    override fun firstOrElse(default: Short): Short =
+        if (size == 0) default else elementData[0]
+
+    override fun lastOrElse(default: Short): Short {
+        val s = size
+        return if (s == 0) default else elementData[s - 1]
+    }
+
+    override fun minOrElse(default: Short): Short {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] < m) m = data[i]
+        return m
+    }
+
+    override fun maxOrElse(default: Short): Short {
+        val s = size
+        if (s == 0) return default
+        val data = elementData
+        var m = data[0]
+        for (i in 1 until s) if (data[i] > m) m = data[i]
+        return m
+    }
+
     companion object {
         private val EMPTY: ShortArray = shortArrayOf()
 
@@ -527,40 +578,6 @@ class ShortArrayList private constructor(
     }
 }
 
-
-fun ShortList.sum(): Int {
-    var s: Int = 0
-    forEach { s += it }
-    return s
-}
-
-
-fun ShortList.minOrNull(): Short? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] < m) m = this[i]
-    return m
-}
-
-fun ShortList.maxOrNull(): Short? {
-    if (isEmpty()) return null
-    var m = this[0]
-    for (i in 1 until size) if (this[i] > m) m = this[i]
-    return m
-}
-
-fun ShortList.first(): Short {
-    if (isEmpty()) throw NoSuchElementException("Empty ShortList")
-    return this[0]
-}
-
-fun ShortList.last(): Short {
-    if (isEmpty()) throw NoSuchElementException("Empty ShortList")
-    return this[lastIndex]
-}
-
-fun ShortList.firstOrNull(): Short? = if (isEmpty()) null else this[0]
-fun ShortList.lastOrNull(): Short? = if (isEmpty()) null else this[lastIndex]
 
 inline fun ShortCollection.forEach(action: (Short) -> Unit) {
     val it = iterator()
