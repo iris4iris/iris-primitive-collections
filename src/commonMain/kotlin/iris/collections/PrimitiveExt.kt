@@ -149,8 +149,6 @@ fun Iterable<Long>.toLongSet(): LongSet {
     return out
 }
 
-fun IntArray.toIntArrayList(): IntArrayList = IntArrayList(this)
-fun LongArray.toLongArrayList(): LongArrayList = LongArrayList(this)
 fun IntArray.toIntSet(): IntSet = IntSet(this)
 fun LongArray.toLongSet(): LongSet = LongSet(this)
 
