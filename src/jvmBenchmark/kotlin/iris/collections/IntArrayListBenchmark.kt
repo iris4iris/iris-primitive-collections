@@ -12,6 +12,7 @@ import kotlinx.benchmark.State
 
 /**
  * IntArrayList vs boxing ArrayList<Int>.
+ * Values are i+128 so they miss Integer cache [-128..127].
  *
  * Run:
  *   ./gradlew benchmark
@@ -33,8 +34,8 @@ open class IntArrayListBenchmark {
         boxed = ArrayList(size)
         primitive = IntArrayList(size)
         for (i in 0 until size) {
-            boxed.add(i)
-            primitive.add(i)
+            boxed.add(i + 128)
+            primitive.add(i + 128)
         }
     }
 
@@ -43,7 +44,7 @@ open class IntArrayListBenchmark {
         val list = ArrayList<Int>()
         var i = 0
         while (i < size) {
-            list.add(i)
+            list.add(i + 128)
             i++
         }
         return list.size
@@ -54,7 +55,7 @@ open class IntArrayListBenchmark {
         val list = IntArrayList()
         var i = 0
         while (i < size) {
-            list.add(i)
+            list.add(i + 128)
             i++
         }
         return list.size
@@ -65,7 +66,7 @@ open class IntArrayListBenchmark {
         val list = ArrayList<Int>(size)
         var i = 0
         while (i < size) {
-            list.add(i)
+            list.add(i + 128)
             i++
         }
         return list.size
@@ -76,7 +77,7 @@ open class IntArrayListBenchmark {
         val list = IntArrayList(size)
         var i = 0
         while (i < size) {
-            list.add(i)
+            list.add(i + 128)
             i++
         }
         return list.size
@@ -135,12 +136,12 @@ open class IntArrayListBenchmark {
 
     @Benchmark
     fun containsBoxed(): Boolean {
-        return boxed.contains(size - 1)
+        return boxed.contains(size - 1 + 128)
     }
 
     @Benchmark
     fun containsPrimitive(): Boolean {
-        return primitive.contains(size - 1)
+        return primitive.contains(size - 1 + 128)
     }
 
     @Benchmark

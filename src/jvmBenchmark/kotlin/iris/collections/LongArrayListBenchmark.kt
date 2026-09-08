@@ -33,7 +33,7 @@ open class LongArrayListBenchmark {
         primitive = LongArrayList(size)
         var i = 0
         while (i < size) {
-            val v = i.toLong()
+            val v = (i + 128).toLong()
             boxed.add(v)
             primitive.add(v)
             i++
@@ -45,7 +45,7 @@ open class LongArrayListBenchmark {
         val list = ArrayList<Long>()
         var i = 0
         while (i < size) {
-            list.add(i.toLong())
+            list.add((i + 128).toLong())
             i++
         }
         return list.size
@@ -56,7 +56,7 @@ open class LongArrayListBenchmark {
         val list = LongArrayList()
         var i = 0
         while (i < size) {
-            list.add(i.toLong())
+            list.add((i + 128).toLong())
             i++
         }
         return list.size
@@ -67,7 +67,7 @@ open class LongArrayListBenchmark {
         val list = ArrayList<Long>(size)
         var i = 0
         while (i < size) {
-            list.add(i.toLong())
+            list.add((i + 128).toLong())
             i++
         }
         return list.size
@@ -78,7 +78,7 @@ open class LongArrayListBenchmark {
         val list = LongArrayList(size)
         var i = 0
         while (i < size) {
-            list.add(i.toLong())
+            list.add((i + 128).toLong())
             i++
         }
         return list.size
@@ -137,12 +137,12 @@ open class LongArrayListBenchmark {
 
     @Benchmark
     fun containsBoxed(): Boolean {
-        return boxed.contains((size - 1).toLong())
+        return boxed.contains((size - 1 + 128).toLong())
     }
 
     @Benchmark
     fun containsPrimitive(): Boolean {
-        return primitive.contains((size - 1).toLong())
+        return primitive.contains((size - 1 + 128).toLong())
     }
 
     @Benchmark

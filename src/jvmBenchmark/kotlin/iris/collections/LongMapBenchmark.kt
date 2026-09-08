@@ -29,13 +29,13 @@ open class LongMapBenchmark {
         primitive = LongMap(size)
         var i = 0
         while (i < size) {
-            val k = i.toLong()
+            val k = (i + 128).toLong()
             val v = i.toString()
             boxed[k] = v
             primitive[k] = v
             i++
         }
-        lastKey = (size - 1).toLong()
+        lastKey = (size - 1 + 128).toLong()
     }
 
     @Benchmark
@@ -43,7 +43,7 @@ open class LongMapBenchmark {
         val map = HashMap<Long, String>()
         var i = 0
         while (i < size) {
-            map[i.toLong()] = "v"
+            map[(i + 128).toLong()] = "v"
             i++
         }
         return map.size
@@ -54,7 +54,7 @@ open class LongMapBenchmark {
         val map = LongMap<String>()
         var i = 0
         while (i < size) {
-            map[i.toLong()] = "v"
+            map[(i + 128).toLong()] = "v"
             i++
         }
         return map.size
@@ -65,7 +65,7 @@ open class LongMapBenchmark {
         val map = HashMap<Long, String>(size)
         var i = 0
         while (i < size) {
-            map[i.toLong()] = "v"
+            map[(i + 128).toLong()] = "v"
             i++
         }
         return map.size
@@ -76,7 +76,7 @@ open class LongMapBenchmark {
         val map = LongMap<String>(size)
         var i = 0
         while (i < size) {
-            map[i.toLong()] = "v"
+            map[(i + 128).toLong()] = "v"
             i++
         }
         return map.size

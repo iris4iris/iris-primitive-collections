@@ -30,11 +30,11 @@ open class IntMapBenchmark {
         var i = 0
         while (i < size) {
             val v = i.toString()
-            boxed[i] = v
-            primitive[i] = v
+            boxed[i + 128] = v
+            primitive[i + 128] = v
             i++
         }
-        lastKey = size - 1
+        lastKey = size - 1 + 128
     }
 
     @Benchmark
@@ -42,7 +42,7 @@ open class IntMapBenchmark {
         val map = HashMap<Int, String>()
         var i = 0
         while (i < size) {
-            map[i] = "v"
+            map[i + 128] = "v"
             i++
         }
         return map.size
@@ -53,7 +53,7 @@ open class IntMapBenchmark {
         val map = IntMap<String>()
         var i = 0
         while (i < size) {
-            map[i] = "v"
+            map[i + 128] = "v"
             i++
         }
         return map.size
@@ -64,7 +64,7 @@ open class IntMapBenchmark {
         val map = HashMap<Int, String>(size)
         var i = 0
         while (i < size) {
-            map[i] = "v"
+            map[i + 128] = "v"
             i++
         }
         return map.size
@@ -75,7 +75,7 @@ open class IntMapBenchmark {
         val map = IntMap<String>(size)
         var i = 0
         while (i < size) {
-            map[i] = "v"
+            map[i + 128] = "v"
             i++
         }
         return map.size

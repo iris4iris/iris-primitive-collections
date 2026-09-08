@@ -29,11 +29,11 @@ open class IntSetBenchmark {
         primitive = IntSet(size)
         var i = 0
         while (i < size) {
-            boxed.add(i)
-            primitive.add(i)
+            boxed.add(i + 128)
+            primitive.add(i + 128)
             i++
         }
-        lastKey = size - 1
+        lastKey = size - 1 + 128
     }
 
     @Benchmark
@@ -41,7 +41,7 @@ open class IntSetBenchmark {
         val set = HashSet<Int>()
         var i = 0
         while (i < size) {
-            set.add(i)
+            set.add(i + 128)
             i++
         }
         return set.size
@@ -52,7 +52,7 @@ open class IntSetBenchmark {
         val set = IntSet()
         var i = 0
         while (i < size) {
-            set.add(i)
+            set.add(i + 128)
             i++
         }
         return set.size
@@ -63,7 +63,7 @@ open class IntSetBenchmark {
         val set = HashSet<Int>(size)
         var i = 0
         while (i < size) {
-            set.add(i)
+            set.add(i + 128)
             i++
         }
         return set.size
@@ -74,7 +74,7 @@ open class IntSetBenchmark {
         val set = IntSet(size)
         var i = 0
         while (i < size) {
-            set.add(i)
+            set.add(i + 128)
             i++
         }
         return set.size
