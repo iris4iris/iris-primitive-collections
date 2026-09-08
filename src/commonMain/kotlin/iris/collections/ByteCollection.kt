@@ -30,6 +30,66 @@ interface ByteCollection : PrimitiveCollection {
         truncated: CharSequence = "...",
         transform: ((Byte) -> CharSequence)? = null,
     ): String
+    fun sum(): Int {
+        var s = 0
+        val it = iterator()
+        while (it.hasNext()) s += it.next().toInt()
+        return s
+    }
+
+    fun average(): Double {
+        if (isEmpty()) return Double.NaN
+        return sum().toDouble() / size
+    }
+
+    fun first(): Byte {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty ByteCollection")
+        return it.next()
+    }
+
+    fun last(): Byte {
+        val it = iterator()
+        if (!it.hasNext()) throw NoSuchElementException("Empty ByteCollection")
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun firstOrElse(default: Byte): Byte {
+        val it = iterator()
+        return if (it.hasNext()) it.next() else default
+    }
+
+    fun lastOrElse(default: Byte): Byte {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var v = it.next()
+        while (it.hasNext()) v = it.next()
+        return v
+    }
+
+    fun minOrElse(default: Byte): Byte {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v < m) m = v
+        }
+        return m
+    }
+
+    fun maxOrElse(default: Byte): Byte {
+        val it = iterator()
+        if (!it.hasNext()) return default
+        var m = it.next()
+        while (it.hasNext()) {
+            val v = it.next()
+            if (v > m) m = v
+        }
+        return m
+    }
 }
 
 interface ByteList : ByteCollection {
