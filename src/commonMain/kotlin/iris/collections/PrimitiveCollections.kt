@@ -64,3 +64,6 @@ interface PrimitiveCollection {
     fun ensureCapacity(minCapacity: Int)
     fun trimToSize()
 }
+
+@PublishedApi
+internal fun Iterable<*>.guessSize(): Int = if (this is Collection<*>) size else 0
