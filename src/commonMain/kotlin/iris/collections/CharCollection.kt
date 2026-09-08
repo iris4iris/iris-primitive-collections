@@ -62,3 +62,34 @@ interface PrimitiveCharIterator {
     fun next(): Char
     fun remove()
 }
+
+inline fun <T> Iterable<T>.mapChars(transform: (T) -> Char): CharArrayList {
+    val out = CharArrayList(guessSize())
+    for (item in this) out += transform(item)
+    return out
+}
+
+inline fun <T> Iterable<T>.mapIndexedChars(transform: (index: Int, T) -> Char): CharArrayList {
+    val out = CharArrayList(guessSize())
+    var i = 0
+    for (item in this) out += transform(i++, item)
+    return out
+}
+
+inline fun <T> Array<T>.mapChars(transform: (T) -> Char): CharArrayList {
+    val out = CharArrayList(size)
+    for (item in this) out += transform(item)
+    return out
+}
+
+fun Iterable<Char>.toCharArrayList(): CharArrayList {
+    val out = CharArrayList(guessSize())
+    for (item in this) out += item
+    return out
+}
+
+inline fun Iterable<Char>.filterChars(predicate: (Char) -> Boolean): CharArrayList {
+    val out = CharArrayList(guessSize())
+    for (item in this) if (predicate(item)) out += item
+    return out
+}

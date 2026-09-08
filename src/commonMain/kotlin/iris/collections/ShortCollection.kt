@@ -62,3 +62,34 @@ interface PrimitiveShortIterator {
     fun next(): Short
     fun remove()
 }
+
+inline fun <T> Iterable<T>.mapShorts(transform: (T) -> Short): ShortArrayList {
+    val out = ShortArrayList(guessSize())
+    for (item in this) out += transform(item)
+    return out
+}
+
+inline fun <T> Iterable<T>.mapIndexedShorts(transform: (index: Int, T) -> Short): ShortArrayList {
+    val out = ShortArrayList(guessSize())
+    var i = 0
+    for (item in this) out += transform(i++, item)
+    return out
+}
+
+inline fun <T> Array<T>.mapShorts(transform: (T) -> Short): ShortArrayList {
+    val out = ShortArrayList(size)
+    for (item in this) out += transform(item)
+    return out
+}
+
+fun Iterable<Short>.toShortArrayList(): ShortArrayList {
+    val out = ShortArrayList(guessSize())
+    for (item in this) out += item
+    return out
+}
+
+inline fun Iterable<Short>.filterShorts(predicate: (Short) -> Boolean): ShortArrayList {
+    val out = ShortArrayList(guessSize())
+    for (item in this) if (predicate(item)) out += item
+    return out
+}

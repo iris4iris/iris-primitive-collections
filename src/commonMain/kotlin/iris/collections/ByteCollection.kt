@@ -62,3 +62,34 @@ interface PrimitiveByteIterator {
     fun next(): Byte
     fun remove()
 }
+
+inline fun <T> Iterable<T>.mapBytes(transform: (T) -> Byte): ByteArrayList {
+    val out = ByteArrayList(guessSize())
+    for (item in this) out += transform(item)
+    return out
+}
+
+inline fun <T> Iterable<T>.mapIndexedBytes(transform: (index: Int, T) -> Byte): ByteArrayList {
+    val out = ByteArrayList(guessSize())
+    var i = 0
+    for (item in this) out += transform(i++, item)
+    return out
+}
+
+inline fun <T> Array<T>.mapBytes(transform: (T) -> Byte): ByteArrayList {
+    val out = ByteArrayList(size)
+    for (item in this) out += transform(item)
+    return out
+}
+
+fun Iterable<Byte>.toByteArrayList(): ByteArrayList {
+    val out = ByteArrayList(guessSize())
+    for (item in this) out += item
+    return out
+}
+
+inline fun Iterable<Byte>.filterBytes(predicate: (Byte) -> Boolean): ByteArrayList {
+    val out = ByteArrayList(guessSize())
+    for (item in this) if (predicate(item)) out += item
+    return out
+}

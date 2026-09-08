@@ -62,3 +62,34 @@ interface PrimitiveDoubleIterator {
     fun next(): Double
     fun remove()
 }
+
+inline fun <T> Iterable<T>.mapDoubles(transform: (T) -> Double): DoubleArrayList {
+    val out = DoubleArrayList(guessSize())
+    for (item in this) out += transform(item)
+    return out
+}
+
+inline fun <T> Iterable<T>.mapIndexedDoubles(transform: (index: Int, T) -> Double): DoubleArrayList {
+    val out = DoubleArrayList(guessSize())
+    var i = 0
+    for (item in this) out += transform(i++, item)
+    return out
+}
+
+inline fun <T> Array<T>.mapDoubles(transform: (T) -> Double): DoubleArrayList {
+    val out = DoubleArrayList(size)
+    for (item in this) out += transform(item)
+    return out
+}
+
+fun Iterable<Double>.toDoubleArrayList(): DoubleArrayList {
+    val out = DoubleArrayList(guessSize())
+    for (item in this) out += item
+    return out
+}
+
+inline fun Iterable<Double>.filterDoubles(predicate: (Double) -> Boolean): DoubleArrayList {
+    val out = DoubleArrayList(guessSize())
+    for (item in this) if (predicate(item)) out += item
+    return out
+}

@@ -62,3 +62,34 @@ interface PrimitiveFloatIterator {
     fun next(): Float
     fun remove()
 }
+
+inline fun <T> Iterable<T>.mapFloats(transform: (T) -> Float): FloatArrayList {
+    val out = FloatArrayList(guessSize())
+    for (item in this) out += transform(item)
+    return out
+}
+
+inline fun <T> Iterable<T>.mapIndexedFloats(transform: (index: Int, T) -> Float): FloatArrayList {
+    val out = FloatArrayList(guessSize())
+    var i = 0
+    for (item in this) out += transform(i++, item)
+    return out
+}
+
+inline fun <T> Array<T>.mapFloats(transform: (T) -> Float): FloatArrayList {
+    val out = FloatArrayList(size)
+    for (item in this) out += transform(item)
+    return out
+}
+
+fun Iterable<Float>.toFloatArrayList(): FloatArrayList {
+    val out = FloatArrayList(guessSize())
+    for (item in this) out += item
+    return out
+}
+
+inline fun Iterable<Float>.filterFloats(predicate: (Float) -> Boolean): FloatArrayList {
+    val out = FloatArrayList(guessSize())
+    for (item in this) if (predicate(item)) out += item
+    return out
+}
