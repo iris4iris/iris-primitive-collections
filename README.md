@@ -139,7 +139,16 @@ val boxed: MutableList<Int> = ids.asMutableList()
 ```bash
 ./gradlew jvmBenchmarkBenchmark
 ./gradlew jvmBenchmarkShort30Benchmark   # только Long, если включён конфиг short30
+./gradlew jvmBenchmarkGcBenchmark        # + JMH -prof gc, куча 256m
 ```
+
+`gc` добавляет колонки JMH GC-профилировщика (Score по-прежнему ns/op):
+
+- `gc.alloc.rate` — МБ/с
+- `gc.alloc.rate.norm` — байт на операцию, главное число
+- `gc.count` / `gc.time` — сколько раз и сколько суммарно собирали за итерацию
+
+`get`/`contains` почти без аллокаций у обоих. Смотреть `put`/`add` и presized vs рост с нуля.
 
 Сценарии:
 

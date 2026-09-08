@@ -43,11 +43,27 @@ benchmark {
             iterationTimeUnit = "s"
         }
         register("short30") {
-            warmups = 3
-            iterations = 5
-            iterationTime = 1
+            warmups = 1
+            iterations = 2
+            iterationTime = 30
             iterationTimeUnit = "s"
             include(".*LongArrayListBenchmark.*")
+        }
+        // JMH -prof gc: alloc rate / bytes per op. Score still ns/op.
+        register("gc") {
+            warmups = 2
+            iterations = 3
+            iterationTime = 1
+            iterationTimeUnit = "s"
+        }
+    }
+}
+
+tasks.withType<JavaExec>().configureEach {
+    if (name == "jvmBenchmarkGcBenchmark") {
+        jvmArgs("-Xmx256m")
+        doFirst {
+            args(args + listOf("-prof", "gc"))
         }
     }
 }
