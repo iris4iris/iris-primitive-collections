@@ -251,7 +251,7 @@ class LongSet(
     }
 
     private inner class BoxedItr : MutableIterator<Long> {
-        private val delegate = iterator()
+        private val delegate = Itr()
         override fun hasNext(): Boolean = delegate.hasNext()
         override fun next(): Long = delegate.next()
         override fun remove() = delegate.remove()

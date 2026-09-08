@@ -251,7 +251,7 @@ class IntSet(
     }
 
     private inner class BoxedItr : MutableIterator<Int> {
-        private val delegate = iterator()
+        private val delegate = Itr()
         override fun hasNext(): Boolean = delegate.hasNext()
         override fun next(): Int = delegate.next()
         override fun remove() = delegate.remove()
