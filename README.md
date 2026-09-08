@@ -21,14 +21,32 @@ kotlin {
 
 ## Типы
 
-`Byte`, `Short`, `Char`, `Int`, `Long`, `Float`, `Double`
+Списки: `Byte`, `Short`, `Char`, `Int`, `Long`, `Float`, `Double`
 
-Для каждого:
+Для каждого списка:
 
 - `{T}Collection` / `{T}List` / `{T}MutableList`
 - `{T}ArrayList` — реализация
 - `{t}ArrayListOf(...)`, `array.to{T}ArrayList()`, `{T}ArrayList.init(n) { i -> ... }`
 - inline `forEach` / `filter` / `map` / `any` / `all` без бокса на горячем пути
+
+Set / Map — ключ без бокса, open addressing, load 2/3:
+
+- `IntSet`, `LongSet`
+- `IntMap<V>`, `LongMap<V>` (`V` обычный объект)
+- `intSetOf(...)`, `longSetOf(...)`
+
+```kotlin
+val seen = IntSet(users.size)
+for (user in users) seen += user.id
+
+val byId = IntMap<User>(users.size)
+for (user in users) byId[user.id] = user
+```
+
+Конструктор с expected size / `ensureCapacity(n)` сразу выделяет таблицу нужной длины.
+
+`nulled` — сентинел пустого слота в массиве **ключей** (`Int.MIN_VALUE` / `Long.MIN_VALUE` по умолчанию). Свободные и удалённые ячейки им заполняются. Этот ключ класть нельзя: `add`/`put` бросают `IllegalArgumentException`. Если такие id бывают, передайте другой `nulled`.
 
 ## Presized capacity
 
@@ -123,5 +141,10 @@ val boxed: MutableList<Int> = ids.asMutableList()
 ./gradlew jvmBenchmarkShort30Benchmark   # только Long, если включён конфиг short30
 ```
 
-Сценарии: `src/jvmBenchmark/kotlin/iris/collections/*ArrayListBenchmark.kt`  
-add (grow / presized), get, forEach, sum, contains, iterator. Размеры: 16 / 1024 / 100000.
+Сценарии:
+
+- списки: `*ArrayListBenchmark.kt` — add / add presized, get, forEach, sum, contains, iterator
+- map: `IntMapBenchmark.kt`, `LongMapBenchmark.kt` vs `HashMap` — put / put presized, get, contains, forEach
+- set: `IntSetBenchmark.kt` vs `HashSet` — add / add presized, contains, forEach
+
+Размеры: 16 / 1024 / 100000.
