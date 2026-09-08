@@ -58,16 +58,18 @@ benchmark {
     }
 }
 
-// kotlinx JvmBenchmarkRunner ignores extra JMH flags like -prof.
 tasks.register<JavaExec>("jmhProfGc") {
     group = "benchmark"
     description = "Raw JMH with -prof gc (alloc rate / B/op)"
     dependsOn("jvmBenchmarkBenchmarkJar")
     mainClass.set("org.openjdk.jmh.Main")
-    classpath(tasks.named("jvmBenchmarkBenchmarkJar"))
+    classpath(
+        file("build/benchmarks/jvmBenchmark/classes"),
+        file("build/benchmarks/jvmBenchmark/resources"),
+        tasks.named("jvmBenchmarkBenchmarkJar"),
+    )
     jvmArgs("-Xmx256m")
     args(
-        ".*",
         "-prof", "gc",
         "-f", "1",
         "-wi", "2",
